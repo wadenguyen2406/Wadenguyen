@@ -1,10 +1,17 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="vi">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Hộp Ghi Chú Nhanh</title>
-    <link rel="stylesheet" href="styles.css" />
+    <style>
+      body { margin:0; min-height:100vh; font-family:Arial,sans-serif; background:#f4d35e; overflow:hidden; }
+      .note-box { position:absolute; top:24px; left:24px; width:320px; border-radius:16px; background:#fff7b2; box-shadow:0 16px 40px rgba(0,0,0,.2); overflow:hidden; user-select:none; }
+      .note-header { display:flex; justify-content:space-between; align-items:center; padding:10px 12px; background:#f4c542; cursor:grab; font-weight:700; color:#3d2a00; }
+      .note-header:active { cursor:grabbing; }
+      .note-header button { border:none; background:transparent; font-size:20px; cursor:pointer; }
+      textarea { width:100%; min-height:220px; border:none; resize:none; padding:14px; font-size:15px; line-height:1.5; background:transparent; outline:none; }
+    </style>
   </head>
   <body>
     <div id="noteBox" class="note-box">
@@ -14,7 +21,22 @@
       </div>
       <textarea id="noteInput" placeholder="Nhập ghi chú..."></textarea>
     </div>
-
-    <script src="script.js"></script>
+    <script>
+      const noteBox=document.getElementById('noteBox');
+      const header=document.querySelector('.note-header');
+      const textarea=document.getElementById('noteInput');
+      const closeBtn=document.getElementById('closeBtn');
+      const STORAGE_KEY='quick-note-position-and-content';
+      let isDragging=false, offsetX=0, offsetY=0;
+      function loadState(){ try { return JSON.parse(localStorage.getItem(STORAGE_KEY)); } catch { return null; } }
+      function saveState(){ localStorage.setItem(STORAGE_KEY, JSON.stringify({left: noteBox.offsetLeft, top: noteBox.offsetTop, text: textarea.value})); }
+      function applyState(state){ if(!state) return; noteBox.style.left=state.left+'px'; noteBox.style.top=state.top+'px'; textarea.value=state.text||''; }
+      header.addEventListener('pointerdown', e=>{ isDragging=true; offsetX=e.clientX-noteBox.offsetLeft; offsetY=e.clientY-noteBox.offsetTop; header.style.cursor='grabbing'; });
+      document.addEventListener('pointermove', e=>{ if(!isDragging) return; const nextX=e.clientX-offsetX; const nextY=e.clientY-offsetY; const maxX=window.innerWidth-noteBox.offsetWidth; const maxY=window.innerHeight-noteBox.offsetHeight; noteBox.style.left=Math.min(Math.max(0,nextX),maxX)+'px'; noteBox.style.top=Math.min(Math.max(0,nextY),maxY)+'px'; });
+      document.addEventListener('pointerup', ()=>{ if(!isDragging) return; isDragging=false; header.style.cursor='grab'; saveState(); });
+      closeBtn.addEventListener('click', ()=> noteBox.style.display='none');
+      textarea.addEventListener('input', saveState);
+      window.addEventListener('load', ()=> applyState(loadState()));
+    </script>
   </body>
 </html>
