@@ -2,6 +2,7 @@ const noteBox = document.getElementById('noteBox');
 const header = document.querySelector('.note-header');
 const textarea = document.getElementById('noteInput');
 const closeBtn = document.getElementById('closeBtn');
+const toggleNoteBtn = document.getElementById('toggleNoteBtn');
 
 const STORAGE_KEY = 'quick-note-position-and-content';
 
@@ -64,7 +65,11 @@ document.addEventListener('pointerup', () => {
 });
 
 closeBtn.addEventListener('click', () => {
-  noteBox.style.display = 'none';
+  noteBox.classList.add('hidden');
+});
+
+toggleNoteBtn.addEventListener('click', () => {
+  noteBox.classList.toggle('hidden');
 });
 
 textarea.addEventListener('input', saveState);
