@@ -271,15 +271,13 @@ textarea::placeholder {
   }
 }
 
-.toggle-note-btn {
+.toggle-note-btn,
+.pomodoro-btn {
   position: fixed;
-  bottom: 24px;
-  right: 24px;
   width: 56px;
   height: 56px;
   border-radius: 50%;
   border: none;
-  background: #facc15;
   color: #1f2937;
   font-size: 20px;
   font-weight: 700;
@@ -287,6 +285,19 @@ textarea::placeholder {
   display: grid;
   place-items: center;
   z-index: 20;
+}
+
+.toggle-note-btn {
+  bottom: 24px;
+  right: 24px;
+  background: #facc15;
+}
+
+.pomodoro-btn {
+  bottom: 100px;
+  right: 24px;
+  background: #ef4444;
+  color: #ffffff;
 }
 
 .note-box.hidden {
