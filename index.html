@@ -4,7 +4,322 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Scheduler + Ghi chú nhanh</title>
-    <link rel="stylesheet" href="styles.css" />
+    <style>
+      :root {
+        color-scheme: light;
+        font-size: 16px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: Inter, Arial, Helvetica, sans-serif;
+        background: linear-gradient(135deg, #1f3757 0%, #334d88 100%);
+        color: #111827;
+      }
+
+      button,
+      textarea {
+        font: inherit;
+      }
+
+      button {
+        cursor: pointer;
+      }
+
+      .app-shell {
+        padding: 24px;
+      }
+
+      .topbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 24px;
+        margin-bottom: 24px;
+        padding: 24px;
+        border-radius: 24px;
+        background: rgba(255, 255, 255, 0.12);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+      }
+
+      .eyebrow {
+        margin: 0 0 8px;
+        color: #cbd5e1;
+        text-transform: uppercase;
+        letter-spacing: 0.16em;
+        font-size: 0.78rem;
+      }
+
+      .topbar h1,
+      .planner-header h2 {
+        margin: 0;
+        color: #f8fafc;
+      }
+
+      .topbar-actions {
+        display: flex;
+        gap: 12px;
+      }
+
+      .btn {
+        padding: 10px 18px;
+        border-radius: 999px;
+        border: none;
+      }
+
+      .btn-primary {
+        background: #2563eb;
+        color: white;
+      }
+
+      .btn-secondary {
+        background: rgba(255, 255, 255, 0.14);
+        color: #e2e8f0;
+      }
+
+      .page-grid {
+        display: grid;
+        grid-template-columns: minmax(260px, 320px) 1fr;
+        gap: 24px;
+      }
+
+      .sidebar {
+        display: grid;
+        gap: 20px;
+      }
+
+      .sidebar-card {
+        padding: 20px;
+        border-radius: 24px;
+        background: rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        color: #e2e8f0;
+      }
+
+      .sidebar-card h2,
+      .sidebar-card h3 {
+        margin-top: 0;
+      }
+
+      .sidebar-card ul {
+        margin: 12px 0 0;
+        padding-left: 18px;
+        color: #cbd5e1;
+      }
+
+      .sidebar-card li {
+        margin-bottom: 10px;
+      }
+
+      .planner {
+        display: grid;
+        gap: 24px;
+      }
+
+      .planner-header {
+        display: flex;
+        justify-content: space-between;
+        gap: 18px;
+        align-items: center;
+        padding: 22px;
+        border-radius: 24px;
+        background: rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        color: #e2e8f0;
+      }
+
+      .planner-meta {
+        color: #cbd5e1;
+      }
+
+      .week-days {
+        display: grid;
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      .day-card {
+        padding: 18px;
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.08);
+        color: #f8fafc;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        min-height: 110px;
+      }
+
+      .day-card strong {
+        display: block;
+        font-size: 1rem;
+      }
+
+      .planner-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+      }
+
+      .task-card {
+        padding: 22px;
+        border-radius: 24px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        color: #e2e8f0;
+      }
+
+      .task-card h3 {
+        margin-top: 0;
+      }
+
+      .task-card p {
+        margin: 10px 0 0;
+        color: #cbd5e1;
+      }
+
+      .task-card.accent {
+        background: linear-gradient(135deg, rgba(37, 99, 235, 0.95), rgba(96, 165, 250, 0.9));
+        color: white;
+      }
+
+      .note-box {
+        position: fixed;
+        top: 24px;
+        right: 24px;
+        width: 320px;
+        max-width: calc(100vw - 32px);
+        border-radius: 16px;
+        background: #fff7b2;
+        box-shadow: 0 20px 50px rgba(15, 23, 42, 0.3);
+        border: 1px solid rgba(15, 23, 42, 0.12);
+        overflow: hidden;
+        user-select: none;
+        z-index: 10;
+      }
+
+      .note-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 14px;
+        background: #f4c542;
+        cursor: move;
+        touch-action: none;
+        user-select: none;
+        font-weight: 700;
+        color: #3d2a00;
+      }
+
+      .note-header:hover {
+        cursor: move;
+      }
+
+      .note-header:active {
+        cursor: grabbing;
+      }
+
+      .note-header button {
+        border: none;
+        background: transparent;
+        font-size: 22px;
+        line-height: 1;
+        cursor: pointer;
+        color: #3d2a00;
+      }
+
+      textarea {
+        width: 100%;
+        min-height: 220px;
+        border: none;
+        resize: none;
+        padding: 16px;
+        font-size: 15px;
+        line-height: 1.5;
+        background: transparent;
+        outline: none;
+      }
+
+      textarea::placeholder {
+        color: #8b6f1c;
+      }
+
+      .toggle-note-btn,
+      .pomodoro-btn {
+        position: fixed;
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        border: none;
+        color: #1f2937;
+        font-size: 20px;
+        font-weight: 700;
+        box-shadow: 0 18px 35px rgba(15, 23, 42, 0.2);
+        display: grid;
+        place-items: center;
+        z-index: 20;
+      }
+
+      .toggle-note-btn {
+        bottom: 24px;
+        right: 24px;
+        background: #facc15;
+      }
+
+      .pomodoro-btn {
+        bottom: 100px;
+        right: 24px;
+        background: #ef4444;
+        color: #ffffff;
+      }
+
+      .note-box.hidden {
+        display: none;
+      }
+
+      @media (max-width: 960px) {
+        .page-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .week-days {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 640px) {
+        .topbar,
+        .planner-header,
+        .sidebar-card,
+        .task-card {
+          padding: 18px;
+        }
+
+        .week-days {
+          grid-template-columns: 1fr;
+        }
+
+        .note-box {
+          left: 12px;
+          right: 12px;
+          width: auto;
+        }
+
+        .toggle-note-btn,
+        .pomodoro-btn {
+          right: 16px;
+        }
+
+        .pomodoro-btn {
+          bottom: 86px;
+        }
+      }
+    </style>
   </head>
   <body>
     <div class="app-shell">
@@ -89,6 +404,83 @@
       <textarea id="noteInput" placeholder="Nhập ghi chú..."></textarea>
     </div>
 
-    <script src="script.js"></script>
+    <script>
+      const noteBox = document.getElementById('noteBox');
+      const header = document.querySelector('.note-header');
+      const textarea = document.getElementById('noteInput');
+      const closeBtn = document.getElementById('closeBtn');
+      const toggleNoteBtn = document.getElementById('toggleNoteBtn');
+      const STORAGE_KEY = 'quick-note-position-and-content';
+      let isDragging = false;
+      let offsetX = 0;
+      let offsetY = 0;
+
+      function loadState() {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (!saved) return null;
+
+        try {
+          return JSON.parse(saved);
+        } catch {
+          return null;
+        }
+      }
+
+      function saveState() {
+        const state = {
+          left: noteBox.offsetLeft,
+          top: noteBox.offsetTop,
+          text: textarea.value,
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      }
+
+      function applyState(state) {
+        if (!state) return;
+        noteBox.style.left = `${Math.max(0, state.left)}px`;
+        noteBox.style.top = `${Math.max(0, state.top)}px`;
+        textarea.value = state.text || '';
+      }
+
+      header.addEventListener('pointerdown', (event) => {
+        isDragging = true;
+        noteBox.setPointerCapture(event.pointerId);
+        offsetX = event.clientX - noteBox.offsetLeft;
+        offsetY = event.clientY - noteBox.offsetTop;
+        header.style.cursor = 'grabbing';
+      });
+
+      document.addEventListener('pointermove', (event) => {
+        if (!isDragging) return;
+
+        const nextX = event.clientX - offsetX;
+        const nextY = event.clientY - offsetY;
+        const maxX = window.innerWidth - noteBox.offsetWidth;
+        const maxY = window.innerHeight - noteBox.offsetHeight;
+
+        noteBox.style.left = `${Math.min(Math.max(0, nextX), maxX)}px`;
+        noteBox.style.top = `${Math.min(Math.max(0, nextY), maxY)}px`;
+      });
+
+      document.addEventListener('pointerup', () => {
+        if (!isDragging) return;
+        isDragging = false;
+        header.style.cursor = 'move';
+        saveState();
+      });
+
+      closeBtn.addEventListener('click', () => {
+        noteBox.classList.add('hidden');
+      });
+
+      toggleNoteBtn.addEventListener('click', () => {
+        noteBox.classList.toggle('hidden');
+      });
+
+      textarea.addEventListener('input', saveState);
+      window.addEventListener('load', () => {
+        applyState(loadState());
+      });
+    </script>
   </body>
 </html>
