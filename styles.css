@@ -202,9 +202,15 @@ button {
   align-items: center;
   padding: 12px 14px;
   background: #f4c542;
-  cursor: grab;
+  cursor: move;
+  touch-action: none;
+  user-select: none;
   font-weight: 700;
   color: #3d2a00;
+}
+
+.note-header:hover {
+  cursor: move;
 }
 
 .note-header:active {
